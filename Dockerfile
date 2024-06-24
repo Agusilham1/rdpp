@@ -1,26 +1,31 @@
-# Gunakan image dasar Debian
+# Base image
 FROM debian:latest
 
-# Update paket dan instal dependensi yang diperlukan
-RUN apt-get update && \
-    apt-get install -y wget gdebi-core
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Download dan instal Google Chrome Remote Desktop
-RUN wget https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb && \
-    gdebi -n chrome-remote-desktop_current_amd64.deb && \
-    rm chrome-remote-desktop_current_amd64.deb
+# Update and install dependencies
+RUN apt-get update && apt-get install -y \
+    wget \
+    curl \
+    dbus-x11 \
+    xfce4 \
+    xrdp \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set lingkungan DISPLAY
-ENV DISPLAY=
+# Download and install Chrome Remote Desktop
+RUN wget https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb \
+    && dpkg -i chrome-remote-desktop_current_amd64.deb \
+    && apt-get install -f -y \
+    && rm chrome-remote-desktop_current_amd64.deb
 
-# Salin script start-host ke dalam container
-COPY start-host.sh /opt/google/chrome-remote-desktop/
+# Configure Chrome Remote Desktop
+COPY crd-start.sh /usr/local/bin/crd-start.sh
+RUN chmod +x /usr/local/bin/crd-start.sh
 
-# Buat script start-host.sh
-RUN echo '#!/bin/bash\n/opt/google/chrome-remote-desktop/start-host --code="4/0ATx3LY7ZYRTIVs9IqLHLnXccabEnhz-ABm81XZjzsWTZDJZAWbwLDslMdMO_bUAy0AhB1w" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname)' > /opt/google/chrome-remote-desktop/start-host.sh
+# Expose port
+EXPOSE 3389
 
-# Jadikan script executable
-RUN chmod +x /opt/google/chrome-remote-desktop/start-host.sh
-
-# Perintah untuk menjalankan script saat container dimulai
-CMD ["/opt/google/chrome-remote-desktop/start-host.sh"]
+# Start Chrome Remote Desktop
+CMD ["crd-start.sh"]
