@@ -1,32 +1,26 @@
-# Gunakan image dasar Ubuntu
-FROM ubuntu:20.04
+# Gunakan image dasar Debian
+FROM debian:latest
 
-# Atur lingkungan non-interaktif untuk mencegah prompt interaktif
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Update sistem dan install dependencies yang diperlukan
+# Update paket dan instal dependensi yang diperlukan
 RUN apt-get update && \
-    apt-get install -y xfce4 xfce4-goodies xorg dbus-x11 x11-xserver-utils && \
-    apt-get install -y xrdp net-tools && \
-    apt-get clean
+    apt-get install -y wget gdebi-core
 
-# Konfigurasi xrdp untuk menggunakan sesi xfce4
-RUN echo xfce4-session >~/.xsession
+# Download dan instal Google Chrome Remote Desktop
+RUN wget https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb && \
+    gdebi -n chrome-remote-desktop_current_amd64.deb && \
+    rm chrome-remote-desktop_current_amd64.deb
 
-# Tambahkan pengguna baru dan atur passwordnya
-RUN useradd -m docker && echo "docker:docker" | chpasswd && adduser docker sudo
+# Set lingkungan DISPLAY
+ENV DISPLAY=
 
-# Konfigurasi xrdp untuk menggunakan startwm.sh
-RUN sed -i.bak '/fi/a #xrdp multiple users configuration\n\
-    xfce4-session\n\
-    ' /etc/xrdp/startwm.sh
+# Salin script start-host ke dalam container
+COPY start-host.sh /opt/google/chrome-remote-desktop/
 
-# Buka port 3389 untuk RDP
-EXPOSE 3389
+# Buat script start-host.sh
+RUN echo '#!/bin/bash\n/opt/google/chrome-remote-desktop/start-host --code="4/0ATx3LY7ZYRTIVs9IqLHLnXccabEnhz-ABm81XZjzsWTZDJZAWbwLDslMdMO_bUAy0AhB1w" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname)' > /opt/google/chrome-remote-desktop/start-host.sh
 
-# Salin skrip start ke dalam container
-COPY start.sh /usr/local/bin/start.sh
-RUN chmod +x /usr/local/bin/start.sh
+# Jadikan script executable
+RUN chmod +x /opt/google/chrome-remote-desktop/start-host.sh
 
-# Gunakan skrip start.sh sebagai perintah default
-CMD ["/usr/local/bin/start.sh"]
+# Perintah untuk menjalankan script saat container dimulai
+CMD ["/opt/google/chrome-remote-desktop/start-host.sh"]
