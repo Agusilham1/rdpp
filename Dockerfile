@@ -7,7 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Update sistem dan install dependencies yang diperlukan
 RUN apt-get update && \
     apt-get install -y xfce4 xfce4-goodies xorg dbus-x11 x11-xserver-utils && \
-    apt-get install -y xrdp && \
+    apt-get install -y xrdp net-tools && \
     apt-get clean
 
 # Konfigurasi xrdp untuk menggunakan sesi xfce4
@@ -24,5 +24,9 @@ RUN sed -i.bak '/fi/a #xrdp multiple users configuration\n\
 # Buka port 3389 untuk RDP
 EXPOSE 3389
 
-# Mulai layanan xrdp
-CMD ["/usr/sbin/xrdp", "-nodaemon"]
+# Salin skrip start ke dalam container
+COPY start.sh /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
+
+# Gunakan skrip start.sh sebagai perintah default
+CMD ["/usr/local/bin/start.sh"]
