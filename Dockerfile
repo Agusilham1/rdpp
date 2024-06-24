@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
     dbus-x11 \
     xfce4 \
     xrdp \
+    python3-xdg \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
