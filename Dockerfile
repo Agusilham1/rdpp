@@ -1,32 +1,22 @@
-# Base image
-FROM debian:latest
+# Use the official Ubuntu 20.04 as the base image
+FROM ubuntu:20.04
 
-# Set environment variables
-ENV DEBIAN_FRONTEND=noninteractive
+# Install necessary packages
+RUN apt-get update && \
+    apt-get install -y openssh-server openssh-client && \
+    apt-get clean
 
-# Update and install dependencies
-RUN apt-get update && apt-get install -y \
-    wget \
-    curl \
-    dbus-x11 \
-    xfce4 \
-    xrdp \
-    python3-xdg \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+# Create the SSH directory and set permissions
+RUN mkdir /var/run/sshd && \
+    mkdir -p /root/.ssh && \
+    chmod 700 /root/.ssh
 
-# Download and install Chrome Remote Desktop
-RUN wget https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb \
-    && dpkg -i chrome-remote-desktop_current_amd64.deb \
-    && apt-get install -f -y \
-    && rm chrome-remote-desktop_current_amd64.deb
+# Copy the start.sh script to the container
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
 
-# Configure Chrome Remote Desktop
-COPY crd-start.sh /usr/local/bin/crd-start.sh
-RUN chmod +x /usr/local/bin/crd-start.sh
+# Expose the SSH port
+EXPOSE 22
 
-# Expose port
-EXPOSE 3389
-
-# Start Chrome Remote Desktop
-CMD ["crd-start.sh"]
+# Use the start.sh script as the container's command
+CMD ["/start.sh"]
