@@ -2,13 +2,16 @@ FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y \
-    wget \
-    curl \
-    gunzip \
-    ntfs-3g \
-    dos2unix \
-    iproute2
+# Update and install required packages
+RUN apt-get update \
+    && apt-get install -y \
+        wget \
+        curl \
+        gzip \
+        ntfs-3g \
+        dos2unix \
+        iproute2 \
+    && rm -rf /var/lib/apt/lists/*
 
 ENV PILIHOS_URL="https://files.sowan.my.id/windows2019.gz"
 ENV IFACE="Ethernet Instance 0 2"
