@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Start SSH service
-/usr/sbin/sshd
+/bin/bash
 
 # Print container's IP address
 if command -v ip > /dev/null 2>&1; then
