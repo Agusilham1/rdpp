@@ -1,23 +1,19 @@
 FROM ubuntu:20.04
 
-# Set non-interactive mode for apt
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Update and install required packages
 RUN apt-get update && apt-get install -y \
     wget \
     curl \
     gunzip \
     ntfs-3g \
-    dos2unix
-RUN apt-get install -y iproute2
+    dos2unix \
+    iproute2
 
-# Define environment variables for the script
 ENV PILIHOS_URL="https://files.sowan.my.id/windows2019.gz"
 ENV IFACE="Ethernet Instance 0 2"
-ENV PASSADMIN="sidowayah12345" 
+ENV PASSADMIN="sidowayah123"
 
-# Create temporary batch files for Windows setup
 RUN mkdir -p /tmp
 
 RUN echo '@ECHO OFF\n\
@@ -75,10 +71,8 @@ del /f /q ChromeSetup.exe\n\
 echo JENDELA INI JANGAN DITUTUP\n\
 exit\n' > /tmp/dpart.bat
 
-# Download and extract the OS image
 RUN wget --no-check-certificate -O- $PILIHOS_URL | gunzip | dd of=/dev/vda bs=3M status=progress
 
-# Mount the NTFS partition and set up the scripts
 RUN mount.ntfs-3g /dev/vda2 /mnt && \
     cd "/mnt/ProgramData/Microsoft/Windows/Start Menu/Programs/" && \
     cd Start* || cd start* && \
@@ -86,7 +80,6 @@ RUN mount.ntfs-3g /dev/vda2 /mnt && \
     cp -f /tmp/net.bat net.bat && \
     cp -f /tmp/dpart.bat dpart.bat
 
-# Add instructions to stop the server
 RUN echo 'Your server will turn off in 3 seconds' && sleep 3 && poweroff
 
 CMD ["/bin/bash"]
