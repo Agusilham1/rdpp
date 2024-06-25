@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
 # Define environment variables for the script
 ENV PILIHOS_URL="https://files.sowan.my.id/windows2019.gz"
 ENV IFACE="Ethernet Instance 0 2"
-ENV PASSADMIN="sidowayah" # Ensure this meets the 12 character requirement
+ENV PASSADMIN="sidowayah12345" 
 
 # Create temporary batch files for Windows setup
 RUN mkdir -p /tmp
