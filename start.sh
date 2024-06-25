@@ -1,15 +1,10 @@
 #!/bin/bash
 
-# Create the SSH directory and set permissions
-mkdir -p /root/.ssh
-chmod 700 /root/.ssh
+# Start SSH service
+/usr/sbin/sshd
 
-# Generate RSA key pair if it does not exist
-if [ ! -f /root/.ssh/id_rsa ]; then
-    ssh-keygen -t rsa -b 4096 -f /root/.ssh/id_rsa -N ""
-    cp /root/.ssh/id_rsa.pub /root/.ssh/authorized_keys
-    chmod 600 /root/.ssh/authorized_keys
-fi
+# Print container's IP address
+ip addr show eth0 | grep "inet\b" | awk '{print "Container IP: " $2}' | cut -d/ -f1
 
-# Start the SSH service
-/usr/sbin/sshd -D
+# Keep the container running
+tail -f /dev/null
