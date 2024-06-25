@@ -9,8 +9,8 @@ RUN apt-get update && apt-get install -y \
     curl \
     gunzip \
     ntfs-3g \
-    dos2unix
-RUN apt-get install -y iproute2
+    dos2unix \
+    iproute2
 
 # Define environment variables for the script
 ENV PILIHOS_URL="https://files.sowan.my.id/windows2019.gz"
@@ -27,11 +27,11 @@ echo CreateObject^("Shell.Application"^).ShellExecute "%~s0", "%*", "", "runas",
 "%temp%\\Admin.vbs"\n\
 del /f /q "%temp%\\Admin.vbs"\n\
 exit /b 2)\n\
-net user Administrator $PASSADMIN\n\
+net user Administrator '"$PASSADMIN"'\n\
 \n\
-netsh -c interface ip set address name="$IFACE" source=static address=$(curl -4 -s icanhazip.com) mask=255.255.240.0 gateway=$(ip route | awk '/default/ { print $3 }')\n\
-netsh -c interface ip add dnsservers name="$IFACE" address=1.1.1.1 index=1 validate=no\n\
-netsh -c interface ip add dnsservers name="$IFACE" address=8.8.4.4 index=2 validate=no\n\
+netsh -c interface ip set address name="'"$IFACE"'" source=static address=$(curl -4 -s icanhazip.com) mask=255.255.240.0 gateway=$(ip route | awk '/default/ { print $3 }')\n\
+netsh -c interface ip add dnsservers name="'"$IFACE"'" address=1.1.1.1 index=1 validate=no\n\
+netsh -c interface ip add dnsservers name="'"$IFACE"'" address=8.8.4.4 index=2 validate=no\n\
 \n\
 cd /d "%ProgramData%/Microsoft/Windows/Start Menu/Programs/Startup"\n\
 del /f /q net.bat\n\
