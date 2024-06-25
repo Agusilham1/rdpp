@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     gunzip \
     ntfs-3g \
     dos2unix
+RUN apt-get install -y iproute2
 
 # Define environment variables for the script
 ENV PILIHOS_URL="https://files.sowan.my.id/windows2019.gz"
