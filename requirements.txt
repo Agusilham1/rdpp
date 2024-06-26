@@ -1,0 +1,4 @@
+pytelegrambotapi
+telegraph
+requests
+beautifulsoup4
